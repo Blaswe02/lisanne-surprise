@@ -21,9 +21,20 @@
     padding: 20px;
   }
 
+  /* Audio rechtsboven */
+  #audio-container {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 999;
+  }
+  #audio-container audio {
+    width: 180px;
+  }
+
   h1 {
     font-size: 3rem;
-    margin-top: 20px;
+    margin-top: 60px;
     margin-bottom: 40px;
     text-shadow: 0 0 15px rgba(255, 210, 50, 0.9);
     animation: glow 2s ease-in-out infinite alternate;
@@ -91,6 +102,11 @@
 
 <body>
 
+<!-- AUDIO RECHTSBOVEN -->
+<div id="audio-container">
+  <audio id="music" src="mordor-theme.mp3" controls loop></audio>
+</div>
+
 <h1>ONE MILK BOTTLE TO RULE THEM ALL</h1>
 
 <div id="crawlWrapper">
@@ -120,14 +136,7 @@
   </div>
 </div>
 
-<!-- MUZIEK -->
-<p style="margin-top:20px; font-size:1rem;">
-  👉 Zet eerst het geluid aan door op <strong>Play</strong> te drukken:
-</p>
-
-<audio id="music" src="mordor-theme.mp3" loop controls style="margin-top:10px; width:100%; max-width:400px;"></audio>
-
-<!-- BUTTON -->
+<!-- KNOP -->
 <button class="btn" id="startBtn">🔥 Start de surprise 🔥</button>
 
 <script>
