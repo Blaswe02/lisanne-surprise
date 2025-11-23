@@ -21,7 +21,7 @@
     padding: 20px;
   }
 
-  /* Audio rechtsboven */
+  /* AUDIO RECHTSBOVEN */
   #audio-container {
     position: fixed;
     top: 10px;
@@ -45,46 +45,36 @@
     to   { text-shadow: 0 0 25px rgba(255, 255, 100, 1); }
   }
 
-  /* LOTR CRAWL */
-  #crawlWrapper {
-    perspective: 400px;
-    height: 600px;
-    overflow: hidden;
-    margin-top: 30px;
-  }
-
-  #crawl {
-    font-size: 20px;
-    line-height: 1.8;
-    transform-origin: 50% 100%;
-    color: #f6d56f;
+  /* VERTICALE LEESBARE SCROLL */
+  #textContainer {
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto;
+    font-size: 1.35rem;         /* grotere tekst */
+    line-height: 1.7;           /* rustiger lezen */
     opacity: 0;
+    transition: opacity 2s ease;
   }
 
-  .crawl-active #crawl {
-    animation: crawl 40s linear forwards;
+  .scroll-active {
+    opacity: 1;
+    animation: scrollUp 45s linear forwards;
   }
 
-  @keyframes crawl {
-    0% {
-      transform: rotateX(25deg) translateY(100%);
-      opacity: 1;
-    }
-    100% {
-      transform: rotateX(25deg) translateY(-250%);
-      opacity: 1;
-    }
+  @keyframes scrollUp {
+    0%   { transform: translateY(50vh); }
+    100% { transform: translateY(-250vh); }
   }
 
-  /* BUTTONS */
+  /* BUTTON */
   .btn {
     background: #f6d56f;
     border: none;
-    padding: 12px 28px;
+    padding: 14px 32px;
     font-size: 1.2rem;
     font-weight: bold;
     border-radius: 30px;
-    margin-top: 20px;
+    margin-top: 30px;
     cursor: pointer;
     transition: 0.2s;
     color: #4b0000;
@@ -102,38 +92,38 @@
 
 <body>
 
-<!-- AUDIO RECHTSBOVEN -->
+<!-- AUDIO -->
 <div id="audio-container">
   <audio id="music" src="mordor-theme.mp3" controls loop></audio>
 </div>
 
 <h1>ONE MILK BOTTLE TO RULE THEM ALL</h1>
 
-<div id="crawlWrapper">
-  <div id="crawl">
-    <p><strong>Sinterklaasgedicht – “One Milk Bottle to Rule Them All (Baby Edition)”</strong></p>
-    <br/>
-    <p>In het rijk van kleine Sven, waar knuffels heersen overal,  
-    viel plots een duistere schaduw… jawel: one milk bottle to rule them all.</p>
+<!-- TEKST CONTAINER -->
+<div id="textContainer">
+  <p><strong>Sinterklaasgedicht – “One Milk Bottle to Rule Them All (Baby Edition)”</strong></p>
+  <br/>
 
-    <p>Een nacht vol draaiend dekentje, een piepje, een gil, een zucht,  
-    King Sven had een nachtmerrie — en heel Sleepalot hield de lucht in, opgelucht.</p>
+  <p>In het rijk van kleine Sven, waar knuffels heersen overal,  
+  viel plots een duistere schaduw… jawel: one milk bottle to rule them all.</p>
 
-    <p>Sir Ivo en Lisanne sprongen op, half slapend maar paraat,  
-    want in hun ouder-avonturenboek staat: “paniek? Pak de fles, meteen, heel daadkrachtig en kwaad.”</p>
+  <p>Een nacht vol draaiend dekentje, een piepje, een gil, een zucht,  
+  King Sven had een nachtmerrie — en heel Sleepalot hield de lucht in, opgelucht.</p>
 
-    <p>Door Luierdal en Speenravijn renden ze, op sokken, in het holst van de nacht,  
-    achtervolgd door gillende aanvallen die alleen baby’s zo perfect op volume brengen, met enorme kracht.</p>
+  <p>Sir Ivo en Lisanne sprongen op, half slapend maar paraat,  
+  want in hun ouder-avonturenboek staat: “paniek? Pak de fles, meteen, heel daadkrachtig en kwaad.”</p>
 
-    <p>Maar dan — de melkfles! Warm, zacht en lichtgevend als een klein wonderding,  
-    en hop: de schaduw uit Sven’s koninkrijk smolt weg alsof het gewoon smurrie was rond een rubberen ring.</p>
+  <p>Door Luierdal en Speenravijn renden ze, op sokken, in het holst van de nacht,  
+  achtervolgd door gillende aanvallen die alleen baby’s zo perfect op volume brengen, met enorme kracht.</p>
 
-    <p>Sven zucht, glimlacht, knijpt zijn oogjes dicht, droomt verder van zachte wolken en snoep,  
-    en Castle Sleepalot is wéér gered dankzij dit magische fles-offensief in één soepele groep.</p>
+  <p>Maar dan — de melkfles! Warm, zacht en lichtgevend als een klein wonderding,  
+  en hop: de schaduw uit Sven’s koninkrijk smolt weg alsof het gewoon smurrie was rond een rubberen ring.</p>
 
-    <p>Daarom geeft Sint jullie deze borden, met een hap alsof iemand niet kon wachten — ach, typisch dat tafereel.  
-    Perfect voor ontbijt, nacht-snacks of reparatie-na-een-nachtelijke-queeste: kortom, handig, grappig en heel veel speel.</p>
-  </div>
+  <p>Sven zucht, glimlacht, knijpt zijn oogjes dicht, droomt verder van zachte wolken en snoep,  
+  en Castle Sleepalot is wéér gered dankzij dit magische fles-offensief in één soepele groep.</p>
+
+  <p>Daarom geeft Sint jullie deze borden, met een hap alsof iemand niet kon wachten — ach, typisch dat tafereel.  
+  Perfect voor ontbijt, nacht-snacks of reparatie-na-een-nachtelijke-queeste: kortom, handig, grappig en heel veel speel.</p>
 </div>
 
 <!-- KNOP -->
@@ -141,10 +131,10 @@
 
 <script>
   const btn = document.getElementById("startBtn");
-  const crawlWrapper = document.getElementById("crawlWrapper");
+  const text = document.getElementById("textContainer");
 
   btn.addEventListener("click", () => {
-    crawlWrapper.classList.add("crawl-active");
+    text.classList.add("scroll-active");
     btn.textContent = "🔥 Enjoy the quest 🔥";
     btn.disabled = true;
   });
