@@ -1,144 +1,165 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>One Milk Bottle To Rule Them All</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One Milk Bottle To Rule Them All</title>
 
-<style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+  <!-- Optioneel mooi LOTR-achtig font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
 
-  body {
-    background: linear-gradient(to bottom, #000000, #1a0b0b, #4b0000);
-    color: #f6d56f;
-    font-family: Georgia, "Times New Roman", serif;
-    overflow-x: hidden;
-    text-align: center;
-    padding: 20px;
-  }
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  /* AUDIO RECHTSBOVEN */
-  #audio-container {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    z-index: 999;
-  }
-  #audio-container audio {
-    width: 180px;
-  }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(to bottom, #000000, #1a0b0b, #4b0000);
+      color: #f6d56f;
+      font-family: "Cinzel", Georgia, "Times New Roman", serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+    }
 
-  h1 {
-    font-size: 3rem;
-    margin-top: 60px;
-    margin-bottom: 40px;
-    text-shadow: 0 0 15px rgba(255, 210, 50, 0.9);
-    animation: glow 2s ease-in-out infinite alternate;
-  }
+    /* audio rechtsboven */
+    #audio-container {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+    }
+    #audio-container audio {
+      width: 180px;
+    }
 
-  @keyframes glow {
-    from { text-shadow: 0 0 10px rgba(255, 200, 0, 0.7); }
-    to   { text-shadow: 0 0 25px rgba(255, 255, 100, 1); }
-  }
+    h1 {
+      font-size: 2.6rem;
+      text-align: center;
+      margin-top: 40px;
+      margin-bottom: 32px;
+      letter-spacing: 0.25rem;
+      color: #ffe9a3;
+      text-shadow: 0 0 12px rgba(255, 210, 80, 0.9);
+    }
 
-  /* VERTICALE LEESBARE SCROLL */
-  #textContainer {
-    width: 90%;
-    max-width: 900px;
-    margin: 0 auto;
-    font-size: 1.35rem;         /* grotere tekst */
-    line-height: 1.7;           /* rustiger lezen */
-    opacity: 0;
-    transition: opacity 2s ease;
-  }
+    .content {
+      max-width: 900px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 16px;
+      padding: 24px 20px 28px;
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
+    }
 
-  .scroll-active {
-    opacity: 1;
-    animation: scrollUp 45s linear forwards;
-  }
+    .content p {
+      font-size: 1.15rem;
+      line-height: 1.8;
+      margin-bottom: 14px;
+      text-align: left;
+    }
 
-  @keyframes scrollUp {
-    0%   { transform: translateY(50vh); }
-    100% { transform: translateY(-250vh); }
-  }
+    .content p.center {
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
 
-  /* BUTTON */
-  .btn {
-    background: #f6d56f;
-    border: none;
-    padding: 14px 32px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 30px;
-    margin-top: 30px;
-    cursor: pointer;
-    transition: 0.2s;
-    color: #4b0000;
-    text-shadow: 0 0 5px rgba(255, 200, 0, 0.8);
-    box-shadow: 0 0 15px rgba(255, 200, 0, 0.9);
-  }
+    .btn-wrapper {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+    }
 
-  .btn:hover {
-    box-shadow: 0 0 25px rgba(255, 230, 120, 1);
-    transform: scale(1.05);
-  }
-</style>
+    .btn {
+      background: #f6d56f;
+      border: none;
+      padding: 12px 32px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      border-radius: 999px;
+      cursor: pointer;
+      color: #4b0000;
+      text-shadow: 0 0 5px rgba(255, 200, 0, 0.8);
+      box-shadow: 0 0 15px rgba(255, 200, 0, 0.9);
+      transition: 0.2s;
+    }
 
+    .btn:hover {
+      box-shadow: 0 0 24px rgba(255, 230, 120, 1);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+        letter-spacing: 0.15rem;
+      }
+      .content p {
+        font-size: 1.05rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- AUDIO -->
-<div id="audio-container">
-  <audio id="music" src="mordor-theme.mp3" controls loop></audio>
-</div>
+  <!-- Muziek rechtsboven -->
+  <div id="audio-container">
+    <audio src="mordor-theme.mp3" controls loop></audio>
+  </div>
 
-<h1>ONE MILK BOTTLE TO RULE THEM ALL</h1>
+  <h1>ONE MILK BOTTLE TO RULE THEM ALL</h1>
 
-<!-- TEKST CONTAINER -->
-<div id="textContainer">
-  <p><strong>Sinterklaasgedicht – “One Milk Bottle to Rule Them All (Baby Edition)”</strong></p>
-  <br/>
+  <div class="content">
+    <p class="center">
+      Sinterklaasgedicht – “One Milk Bottle to Rule Them All (Baby Edition)”
+    </p>
 
-  <p>In het rijk van kleine Sven, waar knuffels heersen overal,  
-  viel plots een duistere schaduw… jawel: one milk bottle to rule them all.</p>
+    <p>
+      In het rijk van kleine Sven, waar knuffels heersen overal,
+      viel plots een duistere schaduw… jawel: one milk bottle to rule them all.
+    </p>
 
-  <p>Een nacht vol draaiend dekentje, een piepje, een gil, een zucht,  
-  King Sven had een nachtmerrie — en heel Sleepalot hield de lucht in, opgelucht.</p>
+    <p>
+      Een nacht vol draaiend dekentje, een piepje, een gil, een zucht,
+      King Sven had een nachtmerrie — en heel Sleepalot hield de lucht in, opgelucht.
+    </p>
 
-  <p>Sir Ivo en Lisanne sprongen op, half slapend maar paraat,  
-  want in hun ouder-avonturenboek staat: “paniek? Pak de fles, meteen, heel daadkrachtig en kwaad.”</p>
+    <p>
+      Sir Ivo en Lisanne sprongen op, half slapend maar paraat,
+      want in hun ouder-avonturenboek staat: “paniek? Pak de fles, meteen, heel daadkrachtig en kwaad.”
+    </p>
 
-  <p>Door Luierdal en Speenravijn renden ze, op sokken, in het holst van de nacht,  
-  achtervolgd door gillende aanvallen die alleen baby’s zo perfect op volume brengen, met enorme kracht.</p>
+    <p>
+      Door Luierdal en Speenravijn renden ze, op sokken, in het holst van de nacht,
+      achtervolgd door gillende aanvallen die alleen baby’s zo perfect op volume brengen, met enorme kracht.
+    </p>
 
-  <p>Maar dan — de melkfles! Warm, zacht en lichtgevend als een klein wonderding,  
-  en hop: de schaduw uit Sven’s koninkrijk smolt weg alsof het gewoon smurrie was rond een rubberen ring.</p>
+    <p>
+      Maar dan — de melkfles! Warm, zacht en lichtgevend als een klein wonderding,
+      en hop: de schaduw uit Sven’s koninkrijk smolt weg alsof het gewoon smurrie was rond een rubberen ring.
+    </p>
 
-  <p>Sven zucht, glimlacht, knijpt zijn oogjes dicht, droomt verder van zachte wolken en snoep,  
-  en Castle Sleepalot is wéér gered dankzij dit magische fles-offensief in één soepele groep.</p>
+    <p>
+      Sven zucht, glimlacht, knijpt zijn oogjes dicht, droomt verder van zachte wolken en snoep,
+      en Castle Sleepalot is wéér gered dankzij dit magische fles-offensief in één soepele groep.
+    </p>
 
-  <p>Daarom geeft Sint jullie deze borden, met een hap alsof iemand niet kon wachten — ach, typisch dat tafereel.  
-  Perfect voor ontbijt, nacht-snacks of reparatie-na-een-nachtelijke-queeste: kortom, handig, grappig en heel veel speel.</p>
-</div>
+    <p>
+      Daarom geeft Sint jullie deze borden, met een hap alsof iemand niet kon wachten — ach, typisch dat tafereel.
+      Perfect voor ontbijt, nacht-snacks of reparatie-na-een-nachtelijke-queeste: kortom, handig, grappig en heel veel speel.
+    </p>
 
-<!-- KNOP -->
-<button class="btn" id="startBtn">🔥 Start de surprise 🔥</button>
-
-<script>
-  const btn = document.getElementById("startBtn");
-  const text = document.getElementById("textContainer");
-
-  btn.addEventListener("click", () => {
-    text.classList.add("scroll-active");
-    btn.textContent = "🔥 Enjoy the quest 🔥";
-    btn.disabled = true;
-  });
-</script>
+    <div class="btn-wrapper">
+      <button class="btn">🔥 Start de surprise 🔥</button>
+    </div>
+  </div>
 
 </body>
 </html>
