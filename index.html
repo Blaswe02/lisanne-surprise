@@ -86,7 +86,6 @@
       }
     }
 
-    /* kleine vonkjes */
     .sparks span {
       position: fixed;
       width: 3px;
@@ -145,7 +144,8 @@ Perfect voor ontbijt, nacht-snacks of reparatie-na-een-nachtelijke-queeste: kort
 
     <button class="btn" id="startBtn">🔥 Start de surprise 🔥</button>
 
-    <audio id="music" src="mordor-theme.mp3" loop></audio>
+    <!-- LET OP: naam moet precies gelijk zijn aan je mp3-bestand -->
+    <audio id="music" src="morder-theme.mp3" loop></audio>
   </div>
 
   <script>
@@ -154,14 +154,9 @@ Perfect voor ontbijt, nacht-snacks of reparatie-na-een-nachtelijke-queeste: kort
     const crawlWrapper = document.getElementById('crawlWrapper');
 
     btn.addEventListener('click', () => {
-      // muziek starten (mag op mobiel omdat dit na een klik is)
       music.volume = 1.0;
       music.play().catch(() => {});
-
-      // scroll-animatie starten
       crawlWrapper.classList.add('crawl-active');
-
-      // knoptekst aanpassen
       btn.textContent = '🔥 Enjoy the quest 🔥';
       btn.disabled = true;
     });
