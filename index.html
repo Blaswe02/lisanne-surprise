@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>One Milk Bottle To Rule Them All</title>
 
-  <!-- Optioneel mooi LOTR-achtig font -->
+  <!-- LOTR-achtig lettertype -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
@@ -35,8 +35,9 @@
       right: 10px;
       z-index: 10;
     }
+
     #audio-container audio {
-      width: 180px;
+      width: 200px;
     }
 
     h1 {
@@ -51,23 +52,26 @@
 
     .content {
       max-width: 900px;
+      width: 100%;
       background: rgba(0, 0, 0, 0.25);
       border-radius: 16px;
       padding: 24px 20px 28px;
       box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
+      box-sizing: border-box;
     }
 
-    .content p {
+    .line {
       font-size: 1.15rem;
       line-height: 1.8;
       margin-bottom: 14px;
       text-align: left;
+      opacity: 0;
+      animation: fadeIn 0.6s forwards;
     }
 
-    .content p.center {
+    .line.first {
       text-align: center;
       font-weight: 600;
-      margin-bottom: 20px;
     }
 
     .btn-wrapper {
@@ -95,12 +99,17 @@
       transform: translateY(-1px);
     }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
     @media (max-width: 600px) {
       h1 {
         font-size: 2rem;
         letter-spacing: 0.15rem;
       }
-      .content p {
+      .line {
         font-size: 1.05rem;
       }
     }
@@ -111,57 +120,63 @@
 
   <!-- Muziek rechtsboven -->
   <div id="audio-container">
-    <audio src="mordor-theme.mp3" controls loop></audio>
+    <audio id="music" src="mordor-theme.mp3" controls loop></audio>
   </div>
 
   <h1>ONE MILK BOTTLE TO RULE THEM ALL</h1>
 
-  <div class="content">
-    <p class="center">
-      Sinterklaasgedicht – “One Milk Bottle to Rule Them All (Baby Edition)”
-    </p>
+  <div class="content" id="content"></div>
 
-    <p>
-      In het rijk van kleine Sven, waar knuffels heersen overal,
-      viel plots een duistere schaduw… jawel: one milk bottle to rule them all.
-    </p>
-
-    <p>
-      Een nacht vol draaiend dekentje, een piepje, een gil, een zucht,
-      King Sven had een nachtmerrie — en heel Sleepalot hield de lucht in, opgelucht.
-    </p>
-
-    <p>
-      Sir Ivo en Lisanne sprongen op, half slapend maar paraat,
-      want in hun ouder-avonturenboek staat: “paniek? Pak de fles, meteen, heel daadkrachtig en kwaad.”
-    </p>
-
-    <p>
-      Door Luierdal en Speenravijn renden ze, op sokken, in het holst van de nacht,
-      achtervolgd door gillende aanvallen die alleen baby’s zo perfect op volume brengen, met enorme kracht.
-    </p>
-
-    <p>
-      Maar dan — de melkfles! Warm, zacht en lichtgevend als een klein wonderding,
-      en hop: de schaduw uit Sven’s koninkrijk smolt weg alsof het gewoon smurrie was rond een rubberen ring.
-    </p>
-
-    <p>
-      Sven zucht, glimlacht, knijpt zijn oogjes dicht, droomt verder van zachte wolken en snoep,
-      en Castle Sleepalot is wéér gered dankzij dit magische fles-offensief in één soepele groep.
-    </p>
-
-    <p>
-      Daarom geeft Sint jullie deze borden, met een hap alsof iemand niet kon wachten — ach, typisch dat tafereel.
-      Perfect voor ontbijt, nacht-snacks of reparatie-na-een-nachtelijke-queeste: kortom, handig, grappig en heel veel speel.
-    </p>
-
-    <div class="btn-wrapper">
-      <button class="btn">🔥 Start de surprise 🔥</button>
-    </div>
+  <div class="btn-wrapper">
+    <button class="btn" id="startBtn">🔥 Start de surprise 🔥</button>
   </div>
+
+  <script>
+    const LINES = [
+      "Sinterklaasgedicht – “One Milk Bottle to Rule Them All (Baby Edition)”",
+      "In het rijk van kleine Sven, waar knuffels heersen overal, viel plots een duistere schaduw… jawel: one milk bottle to rule them all.",
+      "Een nacht vol draaiend dekentje, een piepje, een gil, een zucht, King Sven had een nachtmerrie — en heel Sleepalot hield de lucht in, opgelucht.",
+      "Sir Ivo en Lisanne sprongen op, half slapend maar paraat, want in hun ouder-avonturenboek staat: “paniek? Pak de fles, meteen, heel daadkrachtig en kwaad.”",
+      "Door Luierdal en Speenravijn renden ze, op sokken, in het holst van de nacht, achtervolgd door gillende aanvallen die alleen baby’s zo perfect op volume brengen, met enorme kracht.",
+      "Maar dan — de melkfles! Warm, zacht en lichtgevend als een klein wonderding, en hop: de schaduw uit Sven’s koninkrijk smolt weg alsof het gewoon smurrie was rond een rubberen ring.",
+      "Sven zucht, glimlacht, knijpt zijn oogjes dicht, droomt verder van zachte wolken en snoep, en Castle Sleepalot is wéér gered dankzij dit magische fles-offensief in één soepele groep.",
+      "Daarom geeft Sint jullie deze borden, met een hap alsof iemand niet kon wachten — ach, typisch dat tafereel.",
+      "Perfect voor ontbijt, nacht-snacks of reparatie-na-een-nachtelijke-queeste: kortom, handig, grappig en heel veel speel."
+    ];
+
+    const LINE_DELAY_MS = 2200; // tijd tussen zinnen
+
+    const contentEl = document.getElementById("content");
+    const startBtn = document.getElementById("startBtn");
+    const music = document.getElementById("music");
+
+    function showLine(index) {
+      if (index >= LINES.length) return;
+
+      const p = document.createElement("p");
+      p.textContent = LINES[index];
+      p.className = "line" + (index === 0 ? " first" : "");
+      contentEl.appendChild(p);
+
+      setTimeout(() => {
+        showLine(index + 1);
+      }, LINE_DELAY_MS);
+    }
+
+    startBtn.addEventListener("click", () => {
+      startBtn.disabled = true;
+      startBtn.textContent = "🔥 Enjoy the quest 🔥";
+
+      // probeer muziek te starten; als browser blokkeert, kan gebruiker zelf op Play drukken
+      try {
+        music.volume = 1.0;
+        music.play().catch(() => {});
+      } catch (e) {}
+
+      // start de tekst-animatie
+      showLine(0);
+    });
+  </script>
 
 </body>
 </html>
-
-
