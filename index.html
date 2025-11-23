@@ -147,32 +147,27 @@ Perfect voor ontbijt, nacht-snacks of reparatie-na-een-nachtelijke-queeste: kort
 <!-- audio nu met controls, zodat je altijd handmatig kunt starten -->
 <audio id="music" src="morder-theme.mp3" loop controls style="margin-top:1rem;"></audio>
 
+<button class="btn" id="startBtn">🔥 Start de surprise 🔥</button>
+
+<p style="margin-top:1rem; font-size:0.9rem;">
+  👉 Zet eerst het geluid aan door op <strong>Play</strong> te drukken:
+</p>
+
+<audio id="music" src="morder-theme.mp3" loop controls style="margin-top:0.5rem; width:100%; max-width:400px;"></audio>
+
 <script>
   const btn = document.getElementById('startBtn');
-  const music = document.getElementById('music');
   const crawlWrapper = document.getElementById('crawlWrapper');
 
   btn.addEventListener('click', () => {
-    // scroll starten
+    // alleen de tekst laten scrollen
     crawlWrapper.classList.add('crawl-active');
     btn.textContent = '🔥 Enjoy the quest 🔥';
     btn.disabled = true;
-
-    // muziek proberen te starten
-    music.volume = 1.0;
-    const playPromise = music.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(err => {
-        console.error('Audio play failed:', err);
-        alert(
-          'Je browser blokkeert automatisch afspelen. ' +
-          'Druk op de play-knop onderaan om de muziek te starten.'
-        );
-      });
-    }
   });
 </script>
 </body>
 </html>
+
 
 
