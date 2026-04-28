@@ -1,0 +1,16 @@
+{
+  "name": "mini-lesson-engine",
+  "version": "1.0.0",
+  "description": "ESL mini-lesson generator – Level 0 / 1 / 2",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "playwright": "^1.44.0"
+  }
+}
