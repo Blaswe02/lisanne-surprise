@@ -1,1 +1,4 @@
 node_modules/
+public/*-test.html
+public/*-test.pdf
+*.pdf
