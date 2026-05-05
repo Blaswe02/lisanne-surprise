@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ESL Mini-Lesson Generator</title>
+  <title>ESL Mini-Lesson Engine</title>
   <style>
     :root {
-      --primary:    #2563eb;
-      --primary-h:  #1d4ed8;
-      --success:    #16a34a;
-      --error:      #dc2626;
-      --bg:         #f1f5f9;
-      --surface:    #ffffff;
-      --border:     #e2e8f0;
-      --text:       #1e293b;
-      --muted:      #64748b;
+      --blue:      #2563eb;
+      --blue-h:    #1d4ed8;
+      --pink:      #f43f5e;
+      --pink-h:    #e11d48;
+      --success:   #16a34a;
+      --error:     #dc2626;
+      --bg:        #f8fafc;
+      --surface:   #ffffff;
+      --border:    #e2e8f0;
+      --text:      #1e293b;
+      --muted:     #64748b;
+      --label:     #2563eb;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,22 +32,22 @@
       flex-direction: column;
     }
 
-    /* ── header ── */
-    header {
-      height: 52px;
+    /* ── top bar ── */
+    .topbar {
+      height: 48px;
       background: var(--surface);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      padding: 0 18px;
+      padding: 0 20px;
       gap: 10px;
       flex-shrink: 0;
     }
-    header h1 { font-size: 1.05rem; font-weight: 700; }
-    .chip {
-      background: var(--primary);
+    .topbar h1 { font-size: 1rem; font-weight: 700; }
+    .topbar-badge {
+      background: var(--blue);
       color: #fff;
-      font-size: 0.67rem;
+      font-size: 0.66rem;
       font-weight: 700;
       padding: 2px 8px;
       border-radius: 99px;
@@ -52,78 +55,108 @@
       text-transform: uppercase;
     }
 
-    /* ── layout ── */
+    /* ── two-column layout ── */
     .layout {
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 420px 1fr;
       flex: 1;
       overflow: hidden;
     }
 
-    /* ── left panel ── */
-    .panel {
+    /* ── left: form ── */
+    .form-col {
       background: var(--surface);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
-    .panel-body {
+    .form-scroll {
       flex: 1;
       overflow-y: auto;
-      padding: 16px 16px 8px;
+      padding: 20px 20px 0;
     }
-    .field { margin-bottom: 13px; }
-    label {
+
+    /* ── field ── */
+    .field { margin-bottom: 16px; }
+    .field-label {
       display: block;
-      font-size: 0.74rem;
+      font-size: 0.78rem;
       font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
+      color: var(--label);
+      margin-bottom: 5px;
     }
-    input[type=text], textarea {
+    .field-label .opt {
+      font-weight: 400;
+      color: var(--muted);
+    }
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    input[type=text], input[type=date], textarea {
       width: 100%;
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 7px 10px;
-      font-size: 0.88rem;
+      border-radius: 7px;
+      padding: 9px 12px;
+      font-size: 0.9rem;
       font-family: inherit;
       color: var(--text);
+      background: var(--surface);
       transition: border-color .15s, box-shadow .15s;
       resize: vertical;
     }
-    input[type=text]:focus, textarea:focus {
+    input[type=text]:focus, input[type=date]:focus, textarea:focus {
       outline: none;
-      border-color: var(--primary);
+      border-color: var(--blue);
       box-shadow: 0 0 0 3px rgba(37,99,235,.1);
     }
+    input::placeholder, textarea::placeholder { color: #aab; }
 
-    /* ── footer ── */
-    .panel-foot {
-      padding: 11px 16px 14px;
+    /* ── buttons ── */
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 14px 20px 16px;
       border-top: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      background: var(--surface);
     }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s, opacity .15s;
+    }
+    .btn-generate { background: var(--blue);  color: #fff; }
+    .btn-generate:hover:not(:disabled) { background: var(--blue-h); }
+    .btn-pdf      { background: var(--pink);  color: #fff; }
+    .btn-pdf:hover:not(:disabled)      { background: var(--pink-h); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+
     .status-bar {
-      font-size: 0.81rem;
-      padding: 5px 9px;
-      border-radius: 5px;
-      min-height: 30px;
+      font-size: 0.8rem;
+      padding: 5px 20px 0;
+      min-height: 22px;
       display: flex;
       align-items: center;
       gap: 6px;
     }
     .s-idle    { color: var(--muted); }
-    .s-loading { color: var(--primary); background: rgba(37,99,235,.08); }
-    .s-done    { color: var(--success); background: rgba(22,163,74,.08); }
-    .s-error   { color: var(--error);   background: rgba(220,38,38,.08); }
+    .s-loading { color: var(--blue); }
+    .s-done    { color: var(--success); }
+    .s-error   { color: var(--error); }
 
     .spinner {
-      width: 13px; height: 13px;
+      width: 12px; height: 12px;
       border: 2px solid currentColor;
       border-top-color: transparent;
       border-radius: 50%;
@@ -132,75 +165,48 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 8px 14px;
-      border-radius: 6px;
-      border: none;
-      font-size: 0.87rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .15s, opacity .15s;
-    }
-    .btn-primary  { background: var(--primary); color: #fff; }
-    .btn-primary:hover:not(:disabled)  { background: var(--primary-h); }
-    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-    .btn-secondary:hover:not(:disabled) { background: var(--bg); }
-    button:disabled { opacity: .42; cursor: not-allowed; }
-
     /* ── right: preview ── */
-    .preview-area {
+    .preview-col {
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      background: var(--bg);
     }
-    .preview-head {
+    .preview-topbar {
       height: 44px;
-      padding: 0 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
       flex-shrink: 0;
       gap: 10px;
     }
-    .preview-label {
+    .preview-lbl {
       font-size: 0.74rem;
       font-weight: 600;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      white-space: nowrap;
     }
 
-    /* ── style switcher ── */
-    .style-row {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-    }
+    /* style pills */
+    .style-row { display: flex; gap: 5px; }
     .style-btn {
-      padding: 4px 11px;
+      padding: 3px 11px;
       border-radius: 99px;
       border: 1.5px solid var(--border);
       background: var(--surface);
       color: var(--muted);
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       font-weight: 600;
       cursor: pointer;
-      transition: border-color .15s, color .15s, background .15s;
+      transition: all .15s;
     }
-    .style-btn:hover { border-color: var(--primary); color: var(--primary); }
-    .style-btn.active {
-      border-color: var(--primary);
-      background: var(--primary);
-      color: #fff;
-    }
-    .style-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .style-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .style-btn.active { border-color: var(--blue); background: var(--blue); color: #fff; }
+    .style-btn:disabled { opacity: .38; cursor: not-allowed; }
 
     iframe {
       flex: 1;
@@ -217,91 +223,100 @@
       justify-content: center;
       color: var(--muted);
       gap: 14px;
-      padding: 40px;
     }
-    .placeholder svg { opacity: .2; }
-    .placeholder p { font-size: 0.87rem; text-align: center; line-height: 1.5; }
+    .placeholder svg { opacity: .18; }
+    .placeholder p { font-size: 0.85rem; text-align: center; line-height: 1.6; }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>ESL Mini-Lesson Generator</h1>
-  <span class="chip">Level 0</span>
-</header>
+<div class="topbar">
+  <h1>ESL Mini-Lesson Engine</h1>
+  <span class="topbar-badge">Level 0</span>
+</div>
 
 <div class="layout">
 
-  <div class="panel">
-    <div class="panel-body">
+  <!-- ── left: input form ── -->
+  <div class="form-col">
+    <div class="form-scroll">
+
       <div class="field">
-        <label for="headline">Headline</label>
+        <label class="field-label">Article Headline <span class="opt">(Optional)</span></label>
         <input type="text" id="headline"
-          placeholder="e.g. City bans cars from downtown on weekends" />
+          placeholder="e.g. City to ban cars from downtown" />
       </div>
+
+      <div class="field field-row">
+        <div>
+          <label class="field-label">Date <span class="opt">(Optional)</span></label>
+          <input type="date" id="lessonDate" />
+        </div>
+        <div>
+          <label class="field-label">Lesson ID <span class="opt">(Optional)</span></label>
+          <input type="text" id="lessonId" placeholder="e.g. demo-001" />
+        </div>
+      </div>
+
       <div class="field">
-        <label for="article">Article text</label>
-        <textarea id="article" rows="12"
+        <label class="field-label">News Source URLs <span class="opt">(Optional)</span></label>
+        <input type="text" id="src1" placeholder="https://..." style="margin-bottom:6px" />
+        <input type="text" id="src2" placeholder="https://..." style="margin-bottom:6px" />
+        <input type="text" id="src3" placeholder="https://..." />
+      </div>
+
+      <div class="field">
+        <label class="field-label">News Article Text</label>
+        <textarea id="article" rows="11"
           placeholder="Paste the full news article here…"></textarea>
       </div>
-      <div class="field">
-        <label for="sources">Sources
-          <span style="font-weight:400;text-transform:none">(optional, one URL per line)</span>
-        </label>
-        <textarea id="sources" rows="2"
-          placeholder="https://example.com/article"></textarea>
-      </div>
+
+    </div><!-- /form-scroll -->
+
+    <div class="status-bar s-idle" id="status">
+      Ready — fill in the form and click Generate Lesson.
     </div>
 
-    <div class="panel-foot">
-      <div class="status-bar s-idle" id="status">
-        Ready. Fill in headline + article, then click Generate.
-      </div>
-      <button class="btn-primary" id="generateBtn">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor" stroke-width="2.3">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M13 10V3L4 14h7v7l9-11h-7z"/>
-        </svg>
-        Generate Level 0 Lesson
+    <div class="btn-row">
+      <button class="btn btn-generate" id="generateBtn">
+        Generate Lesson
       </button>
-      <button class="btn-secondary" id="downloadBtn" disabled>
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor" stroke-width="2.3">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
+      <button class="btn btn-pdf" id="downloadBtn" disabled>
         Download PDF
       </button>
     </div>
-  </div>
+  </div><!-- /form-col -->
 
-  <div class="preview-area">
-    <div class="preview-head">
-      <span class="preview-label">Preview</span>
-      <div class="style-row" id="styleRow">
-        <!-- populated by JS from /api/themes -->
-      </div>
+  <!-- ── right: preview ── -->
+  <div class="preview-col">
+    <div class="preview-topbar">
+      <span class="preview-lbl">Preview</span>
+      <div class="style-row" id="styleRow"></div>
     </div>
 
     <div class="placeholder" id="placeholder">
-      <svg width="64" height="64" fill="none" viewBox="0 0 24 24"
+      <svg width="60" height="60" fill="none" viewBox="0 0 24 24"
            stroke="currentColor" stroke-width="1">
         <path stroke-linecap="round" stroke-linejoin="round"
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
       </svg>
-      <p>Your printable lesson preview appears here.<br>Fill in the form and click Generate.</p>
+      <p>Your printable lesson will appear here.<br>
+         Paste an article and click <strong>Generate Lesson</strong>.</p>
     </div>
 
     <iframe id="preview" title="Lesson preview"></iframe>
   </div>
 
-</div>
+</div><!-- /layout -->
 
 <script>
   const headlineEl  = document.getElementById('headline');
   const articleEl   = document.getElementById('article');
-  const sourcesEl   = document.getElementById('sources');
+  const src1El      = document.getElementById('src1');
+  const src2El      = document.getElementById('src2');
+  const src3El      = document.getElementById('src3');
+  const dateEl      = document.getElementById('lessonDate');
+  const lessonIdEl  = document.getElementById('lessonId');
   const generateBtn = document.getElementById('generateBtn');
   const downloadBtn = document.getElementById('downloadBtn');
   const statusEl    = document.getElementById('status');
@@ -310,39 +325,34 @@
   const styleRow    = document.getElementById('styleRow');
 
   let lastHtml     = null;
-  let lastData     = null;   // raw lesson data (no html) for re-render
+  let lastData     = null;
   let lastHeadline = '';
   let lastSources  = [];
+  let lastMeta     = {};
   let activeStyle  = 'classic';
 
-  // ── status ─────────────────────────────────────────────────────────────────
   function setStatus(msg, type, spinner = false) {
     statusEl.className = `status-bar s-${type}`;
     statusEl.innerHTML = spinner ? `<span class="spinner"></span>${msg}` : msg;
   }
 
-  // ── build style buttons ────────────────────────────────────────────────────
-  fetch('/api/themes')
-    .then(r => r.json())
-    .then(themes => {
-      themes.forEach(({ id, label }) => {
-        const btn = document.createElement('button');
-        btn.className = 'style-btn' + (id === 'classic' ? ' active' : '');
-        btn.textContent = label;
-        btn.dataset.style = id;
-        btn.disabled = true;
-        btn.addEventListener('click', () => switchStyle(id));
-        styleRow.appendChild(btn);
-      });
-    })
-    .catch(() => {});
+  // ── load theme buttons ─────────────────────────────────────────────────────
+  fetch('/api/themes').then(r => r.json()).then(themes => {
+    themes.forEach(({ id, label }) => {
+      const btn = document.createElement('button');
+      btn.className = 'style-btn' + (id === 'classic' ? ' active' : '');
+      btn.textContent = label;
+      btn.dataset.style = id;
+      btn.disabled = true;
+      btn.addEventListener('click', () => switchStyle(id));
+      styleRow.appendChild(btn);
+    });
+  }).catch(() => {});
 
   function setActiveStyleBtn(id) {
-    styleRow.querySelectorAll('.style-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.style === id);
-    });
+    styleRow.querySelectorAll('.style-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.style === id));
   }
-
   function enableStyleBtns(on) {
     styleRow.querySelectorAll('.style-btn').forEach(b => { b.disabled = !on; });
   }
@@ -350,24 +360,22 @@
   // ── switch style (no AI call) ──────────────────────────────────────────────
   async function switchStyle(style) {
     if (!lastData || style === activeStyle) return;
-
     enableStyleBtns(false);
     setStatus('Switching style…', 'loading', true);
-
     try {
       const res  = await fetch('/api/render', {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({
+        body: JSON.stringify({
           headline: lastHeadline,
           sources:  lastSources,
+          meta:     lastMeta,
           data:     lastData,
           style,
         }),
       });
       const json = await res.json();
-      if (!res.ok || json.error) throw new Error(json.error || `HTTP ${res.status}`);
-
+      if (!res.ok || json.error) throw new Error(json.error);
       lastHtml    = json.html;
       activeStyle = style;
       previewEl.srcdoc = lastHtml;
@@ -384,10 +392,14 @@
   generateBtn.addEventListener('click', async () => {
     const headline = headlineEl.value.trim();
     const article  = articleEl.value.trim();
-    if (!headline) { setStatus('Please enter a headline.', 'error'); return; }
-    if (!article)  { setStatus('Please paste the article text.', 'error'); return; }
+    if (!article) { setStatus('Please paste the article text.', 'error'); return; }
 
-    const sources = sourcesEl.value.split('\n').map(s => s.trim()).filter(Boolean);
+    const sources = [src1El.value, src2El.value, src3El.value]
+      .map(s => s.trim()).filter(Boolean);
+    const meta = {
+      date:     dateEl.value      || null,
+      lessonId: lessonIdEl.value.trim() || null,
+    };
 
     generateBtn.disabled = true;
     downloadBtn.disabled = true;
@@ -397,24 +409,23 @@
 
     try {
       const res  = await fetch('/api/generate-level0', {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ headline, article, sources, style: activeStyle }),
+        body: JSON.stringify({ headline, article, sources, meta, style: activeStyle }),
       });
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
 
-      // store data without html for re-render
       const { html, ...lessonData } = data;
       lastData     = lessonData;
       lastHtml     = html;
       lastHeadline = headline;
       lastSources  = sources;
+      lastMeta     = meta;
 
       placeholderEl.style.display = 'none';
       previewEl.style.display     = 'block';
       previewEl.srcdoc            = lastHtml;
-
       downloadBtn.disabled = false;
       enableStyleBtns(true);
       setStatus('Lesson generated!', 'done');
@@ -430,12 +441,11 @@
     if (!lastHtml) return;
     downloadBtn.disabled = true;
     setStatus('Generating PDF…', 'loading', true);
-
     try {
       const res = await fetch('/api/pdf', {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ html: lastHtml }),
+        body: JSON.stringify({ html: lastHtml }),
       });
       if (!res.ok) {
         const e = await res.json().catch(() => ({}));
@@ -443,8 +453,9 @@
       }
       const blob = await res.blob();
       const url  = URL.createObjectURL(blob);
+      const id   = lastMeta.lessonId || activeStyle;
       const a    = Object.assign(document.createElement('a'), {
-        href: url, download: `lesson-level0-${activeStyle}.pdf`,
+        href: url, download: `lesson-${id}.pdf`,
       });
       document.body.appendChild(a);
       a.click();
@@ -458,7 +469,7 @@
     }
   });
 
-  // Ctrl/Cmd+Enter shortcut
+  // Ctrl/Cmd+Enter
   document.addEventListener('keydown', e => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !generateBtn.disabled)
       generateBtn.click();

@@ -177,7 +177,7 @@ const THEMES = {
 
 // ── HTML template ─────────────────────────────────────────────────────────────
 
-function buildHTML(headline, sources, data, style = 'classic') {
+function buildHTML(headline, sources, data, style = 'classic', meta = {}) {
   const { reading, phrase_match, gap_fill, no_spaces, writing_prompt } = data;
 
   const p1Phrase = buildPhraseRows(phrase_match.p1_left,  phrase_match.p1_right);
@@ -192,6 +192,12 @@ function buildHTML(headline, sources, data, style = 'classic') {
   const sourcesBlock = Array.isArray(sources) && sources.filter(Boolean).length
     ? `<p class="src">Sources: ${sources.filter(Boolean).map(escapeHTML).join(' &bull; ')}</p>`
     : '';
+
+  const metaLine = [
+    meta.date     ? `<span class="meta-date">${escapeHTML(meta.date)}</span>` : '',
+    meta.lessonId ? `<span class="meta-id">ID: ${escapeHTML(meta.lessonId)}</span>` : '',
+  ].filter(Boolean).join('<span class="meta-sep"> &nbsp;|&nbsp; </span>');
+  const metaBlock = metaLine ? `<p class="meta-row">${metaLine}</p>` : '';
 
   const writingLines = Array(6).fill('<div class="wl"></div>').join('\n      ');
   const themeCss = (THEMES[style] ?? THEMES.classic).css;
@@ -231,6 +237,7 @@ function buildHTML(headline, sources, data, style = 'classic') {
   .ak-pm-row { margin-bottom: 4pt; }
   .ak-gf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3pt; margin-top: 7pt; }
   @media print { .ak { page-break-before: always; } }
+  .meta-row { font-size: 8pt; color: #888; margin-top: 4pt; }
 
   /* theme */
   ${themeCss}
@@ -241,6 +248,7 @@ function buildHTML(headline, sources, data, style = 'classic') {
 <div class="hdr">
   <h1>${escapeHTML(headline)}</h1>
   <span class="badge">Level 0 &ndash; Pre-A1/A1</span>
+  ${metaBlock}
   ${sourcesBlock}
 </div>
 
@@ -389,7 +397,7 @@ function getMockData(headline) {
 
 app.post('/api/generate-level0', async (req, res) => {
   try {
-    const { headline, article, sources, style } = req.body ?? {};
+    const { headline, article, sources, style, meta } = req.body ?? {};
     if (!headline || !article) {
       return res.status(400).json({ error: 'headline and article are required' });
     }
@@ -418,7 +426,7 @@ app.post('/api/generate-level0', async (req, res) => {
       writing_prompt: aiData.writing_prompt ?? '',
     };
 
-    const html = buildHTML(headline, sources, fullData, style);
+    const html = buildHTML(headline, sources, fullData, style, meta);
 
     res.json({ ...fullData, html });
   } catch (err) {
@@ -430,11 +438,11 @@ app.post('/api/generate-level0', async (req, res) => {
 // Re-render with a different style (no AI call — instant)
 app.post('/api/render', (req, res) => {
   try {
-    const { headline, sources, data, style } = req.body ?? {};
+    const { headline, sources, data, style, meta } = req.body ?? {};
     if (!headline || !data) {
       return res.status(400).json({ error: 'headline and data are required' });
     }
-    const html = buildHTML(headline, sources, data, style);
+    const html = buildHTML(headline, sources, data, style, meta);
     res.json({ html });
   } catch (err) {
     console.error('[render]', err);
