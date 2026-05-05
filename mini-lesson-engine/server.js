@@ -45,7 +45,6 @@ function ensureArray(val, n = 8) {
   return out;
 }
 
-// Remove spaces, wrap at 60 chars
 function buildNoSpaces(p1, p2) {
   const raw = (p1 + ' ' + p2).replace(/ /g, '');
   return Array.from(
@@ -54,13 +53,11 @@ function buildNoSpaces(p1, p2) {
   ).join('\n');
 }
 
-// Deterministic shuffle: rotate right column by +3 positions
 function buildPhraseRows(lefts, rights) {
   const LETTERS = 'ABCDEFGH';
   const n = 8;
   const L = ensureArray(lefts,  n);
   const R = ensureArray(rights, n);
-  // displayOrder[displayPos] = originalIndex of the right phrase shown there
   const displayOrder = Array.from({ length: n }, (_, i) => (i + 3) % n);
 
   const rows = L.map((left, i) => {
@@ -74,7 +71,6 @@ function buildPhraseRows(lefts, rights) {
     </tr>`;
   }).join('\n');
 
-  // left[i] matches right[i]; right[i] is displayed at position p where displayOrder[p]===i
   const answerKey = L.map((_, i) => {
     const displayPos = displayOrder.indexOf(i);
     return `${i + 1}=${LETTERS[displayPos]}`;
@@ -83,9 +79,105 @@ function buildPhraseRows(lefts, rights) {
   return { rows, answerKey };
 }
 
+// ── themes ────────────────────────────────────────────────────────────────────
+
+const THEMES = {
+  classic: {
+    label: 'Classic',
+    css: `
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 10.5pt; color: #111; line-height: 1.55; }
+  .hdr { border-bottom: 2px solid #111; }
+  .hdr h1 { font-size: 16pt; font-weight: 700; }
+  .badge { background: #111; color: #fff; padding: 1pt 9pt; font-size: 8pt; letter-spacing: 1.2px; text-transform: uppercase; border-radius: 2px; }
+  h2 { font-size: 10.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #111; padding-bottom: 3pt; }
+  h3 { font-size: 10pt; font-weight: 700; }
+  .instruct { font-size: 9.5pt; color: #444; font-style: italic; }
+  .para-lbl { color: #555; }
+  .pk { color: #666; }
+  .mono { background: #f8f8f8; border: 1px solid #ccc; font-size: 9.5pt; line-height: 1.8; padding: 9pt 10pt; }
+  .wp { border: 1.5px solid #111; padding: 9pt 11pt 5pt; }
+  .src { font-size: 7.5pt; color: #666; }
+  .ak-item { font-size: 10pt; }
+  .ak-pm-row { font-size: 10pt; }
+`,
+  },
+
+  editorial: {
+    label: 'Editorial',
+    css: `
+  body { font-family: Georgia, 'Times New Roman', serif; font-size: 10.5pt; color: #1a1a2e; line-height: 1.6; }
+  .hdr { border-bottom: 3px double #1a1a2e; }
+  .hdr h1 { font-size: 18pt; font-weight: 700; font-style: italic; letter-spacing: -0.3px; }
+  .badge { background: #1a1a2e; color: #f5e6c8; padding: 1pt 9pt; font-size: 7.5pt; letter-spacing: 1.5px; text-transform: uppercase; font-family: Arial, sans-serif; }
+  h2 { font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 0.5px solid #999; padding-bottom: 3pt; font-family: Arial, sans-serif; color: #555; }
+  h3 { font-size: 10pt; font-weight: 700; font-style: italic; font-family: Georgia, serif; }
+  .instruct { font-size: 9pt; color: #555; font-style: italic; }
+  .para-lbl { font-family: Arial, sans-serif; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.8px; color: #888; }
+  .pk { color: #888; }
+  table.pm { font-size: 10pt; }
+  .mono { background: #fafaf7; border: 0.5px solid #bbb; border-left: 3px solid #1a1a2e; font-size: 9pt; line-height: 1.9; padding: 9pt 12pt; }
+  .wp { border: 0.5px solid #999; border-top: 2px solid #1a1a2e; padding: 9pt 11pt 5pt; }
+  .src { font-size: 7.5pt; color: #888; font-style: italic; }
+  .ak-item { font-size: 10pt; font-family: Arial, sans-serif; }
+  .ak-pm-row { font-size: 10pt; font-family: Arial, sans-serif; }
+`,
+  },
+
+  compact: {
+    label: 'Compact',
+    css: `
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; color: #111; line-height: 1.45; }
+  .hdr { border-bottom: 1.5px solid #111; padding-bottom: 6pt; margin-bottom: 10pt; }
+  .hdr h1 { font-size: 13pt; font-weight: 700; }
+  .badge { background: #111; color: #fff; padding: 0pt 7pt; font-size: 7.5pt; letter-spacing: 1px; text-transform: uppercase; border-radius: 1px; }
+  section { margin-top: 11pt; }
+  h2 { font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 0.75px solid #111; padding-bottom: 2pt; margin-bottom: 6pt; }
+  h3 { font-size: 9pt; font-weight: 700; margin: 6pt 0 4pt; }
+  .instruct { font-size: 8.5pt; color: #444; font-style: italic; margin-bottom: 5pt; }
+  .para-lbl { font-size: 8pt; color: #666; margin-bottom: 2pt; }
+  .reading-p { margin-bottom: 7pt; }
+  table.pm { font-size: 9pt; }
+  table.pm td { padding: 1pt 2pt; }
+  .gap-text { line-height: 1.85; font-size: 9.5pt; }
+  .mono { background: #f5f5f5; border: 0.75px solid #ccc; font-size: 8.5pt; line-height: 1.6; padding: 6pt 8pt; }
+  .wp { border: 1px solid #111; padding: 7pt 9pt 4pt; }
+  .wp-q { margin-bottom: 14pt; }
+  .wl { height: 18pt; }
+  .src { font-size: 7pt; color: #666; }
+  .ak-item { font-size: 9pt; }
+  .ak-pm-row { font-size: 9pt; }
+  .ak-gf { grid-template-columns: repeat(6, 1fr); }
+`,
+  },
+
+  modern: {
+    label: 'Modern',
+    css: `
+  body { font-family: -apple-system, 'Segoe UI', Arial, sans-serif; font-size: 10.5pt; color: #0f172a; line-height: 1.55; }
+  .hdr { border-bottom: none; background: #0f172a; color: #fff; padding: 12pt 14pt; margin: -18mm -18mm 14pt; }
+  .hdr h1 { font-size: 15pt; font-weight: 700; color: #fff; }
+  .badge { background: #3b82f6; color: #fff; padding: 1pt 9pt; font-size: 8pt; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 99px; }
+  .src { font-size: 7.5pt; color: #94a3b8; margin-top: 5pt; }
+  h2 { font-size: 9.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #3b82f6; border-bottom: 1px solid #e2e8f0; padding-bottom: 3pt; }
+  h3 { font-size: 10pt; font-weight: 600; color: #334155; }
+  .instruct { font-size: 9.5pt; color: #64748b; font-style: italic; }
+  .para-lbl { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #3b82f6; }
+  .reading-p { background: #f8fafc; border-left: 3px solid #3b82f6; padding: 6pt 10pt; margin-bottom: 8pt; border-radius: 0 4px 4px 0; }
+  .pk { color: #94a3b8; }
+  table.pm { font-size: 10pt; }
+  .mono { background: #f1f5f9; border: none; border-left: 3px solid #3b82f6; font-size: 9.5pt; line-height: 1.8; padding: 9pt 12pt; }
+  .wp { border: none; background: #eff6ff; border-left: 4px solid #3b82f6; padding: 10pt 12pt 6pt; }
+  .wl { border-bottom: 1px solid #cbd5e1; height: 21pt; }
+  .ak { background: #f8fafc; padding: 14pt; margin: 0 -18mm; padding-left: 18mm; padding-right: 18mm; }
+  .ak-item { font-size: 10pt; }
+  .ak-pm-row { font-size: 10pt; }
+`,
+  },
+};
+
 // ── HTML template ─────────────────────────────────────────────────────────────
 
-function buildHTML(headline, sources, data) {
+function buildHTML(headline, sources, data, style = 'classic') {
   const { reading, phrase_match, gap_fill, no_spaces, writing_prompt } = data;
 
   const p1Phrase = buildPhraseRows(phrase_match.p1_left,  phrase_match.p1_right);
@@ -102,6 +194,7 @@ function buildHTML(headline, sources, data) {
     : '';
 
   const writingLines = Array(6).fill('<div class="wl"></div>').join('\n      ');
+  const themeCss = (THEMES[style] ?? THEMES.classic).css;
 
   return `<!doctype html>
 <html lang="en">
@@ -111,72 +204,36 @@ function buildHTML(headline, sources, data) {
 <style>
   @page { size: A4; margin: 18mm 18mm 20mm; }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10.5pt;
-    color: #111;
-    line-height: 1.55;
-  }
 
-  /* ── header ── */
-  .hdr { padding-bottom: 9pt; border-bottom: 2px solid #111; margin-bottom: 14pt; }
-  .hdr h1 { font-size: 16pt; font-weight: 700; line-height: 1.25; margin-bottom: 5pt; }
-  .badge {
-    display: inline-block;
-    background: #111; color: #fff;
-    padding: 1pt 9pt;
-    font-size: 8pt; letter-spacing: 1.2px; text-transform: uppercase;
-    border-radius: 2px;
-  }
-  .src { font-size: 7.5pt; color: #666; margin-top: 5pt; }
-
-  /* ── sections ── */
+  /* structural */
+  .hdr { padding-bottom: 9pt; margin-bottom: 14pt; }
+  .badge { display: inline-block; }
   section { margin-top: 16pt; }
-  h2 {
-    font-size: 10.5pt; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.4px;
-    border-bottom: 1px solid #111; padding-bottom: 3pt; margin-bottom: 9pt;
-  }
-  h3 { font-size: 10pt; font-weight: 700; margin: 9pt 0 5pt; }
-  .instruct { font-size: 9.5pt; color: #444; font-style: italic; margin-bottom: 7pt; }
-
-  /* ── reading ── */
-  .para-lbl { font-weight: 700; font-size: 9pt; color: #555; margin-bottom: 3pt; }
+  h2 { margin-bottom: 9pt; }
+  h3 { margin: 9pt 0 5pt; }
+  .instruct { margin-bottom: 7pt; }
+  .para-lbl { font-weight: 700; font-size: 9pt; margin-bottom: 3pt; }
   .reading-p { margin-bottom: 10pt; }
-
-  /* ── phrase match ── */
-  table.pm { width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 4pt; }
+  table.pm { width: 100%; border-collapse: collapse; margin-bottom: 4pt; }
   table.pm td { padding: 2pt 3pt; vertical-align: top; }
   .pn { width: 18pt; font-weight: 700; white-space: nowrap; }
   .pl { width: 42%; }
   .pg { width: 12pt; }
-  .pk { width: 18pt; font-weight: 700; color: #666; }
-
-  /* ── gap fill ── */
+  .pk { width: 18pt; font-weight: 700; }
   .gap-text { line-height: 2.1; font-size: 10.5pt; }
-  .blank { }
   .ul { text-decoration: underline; }
-
-  /* ── no-spaces ── */
-  .mono {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 9.5pt; white-space: pre; line-height: 1.8;
-    background: #f8f8f8; border: 1px solid #ccc;
-    padding: 9pt 10pt;
-  }
-
-  /* ── writing prompt ── */
-  .wp { border: 1.5px solid #111; padding: 9pt 11pt 5pt; }
+  .mono { font-family: 'Courier New', Courier, monospace; white-space: pre; }
+  .wp { padding: 9pt 11pt 5pt; }
   .wp-q { font-weight: 700; margin-bottom: 18pt; }
   .wl { border-bottom: 1px solid #bbb; height: 21pt; }
-
-  /* ── answer key ── */
   .ak { page-break-before: always; }
   .ak-pm { margin-top: 8pt; }
-  .ak-pm-row { font-size: 10pt; margin-bottom: 4pt; }
+  .ak-pm-row { margin-bottom: 4pt; }
   .ak-gf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3pt; margin-top: 7pt; }
-  .ak-item { font-size: 10pt; }
   @media print { .ak { page-break-before: always; } }
+
+  /* theme */
+  ${themeCss}
 </style>
 </head>
 <body>
@@ -332,7 +389,7 @@ function getMockData(headline) {
 
 app.post('/api/generate-level0', async (req, res) => {
   try {
-    const { headline, article, sources } = req.body ?? {};
+    const { headline, article, sources, style } = req.body ?? {};
     if (!headline || !article) {
       return res.status(400).json({ error: 'headline and article are required' });
     }
@@ -361,13 +418,33 @@ app.post('/api/generate-level0', async (req, res) => {
       writing_prompt: aiData.writing_prompt ?? '',
     };
 
-    const html = buildHTML(headline, sources, fullData);
+    const html = buildHTML(headline, sources, fullData, style);
 
     res.json({ ...fullData, html });
   } catch (err) {
     console.error('[generate-level0]', err);
     res.status(500).json({ error: err.message || 'Internal server error' });
   }
+});
+
+// Re-render with a different style (no AI call — instant)
+app.post('/api/render', (req, res) => {
+  try {
+    const { headline, sources, data, style } = req.body ?? {};
+    if (!headline || !data) {
+      return res.status(400).json({ error: 'headline and data are required' });
+    }
+    const html = buildHTML(headline, sources, data, style);
+    res.json({ html });
+  } catch (err) {
+    console.error('[render]', err);
+    res.status(500).json({ error: err.message || 'Render failed' });
+  }
+});
+
+// Expose available theme names to the frontend
+app.get('/api/themes', (_req, res) => {
+  res.json(Object.entries(THEMES).map(([id, t]) => ({ id, label: t.label })));
 });
 
 app.post('/api/pdf', async (req, res) => {
