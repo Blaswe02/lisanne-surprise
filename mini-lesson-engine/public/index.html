@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESL Mini-Lesson Engine</title>
+  <style>
+    :root {
+      --blue:      #2563eb;
+      --blue-h:    #1d4ed8;
+      --pink:      #f43f5e;
+      --pink-h:    #e11d48;
+      --success:   #16a34a;
+      --error:     #dc2626;
+      --bg:        #f8fafc;
+      --surface:   #ffffff;
+      --border:    #e2e8f0;
+      --text:      #1e293b;
+      --muted:     #64748b;
+      --label:     #2563eb;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── top bar ── */
+    .topbar {
+      height: 48px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .topbar h1 { font-size: 1rem; font-weight: 700; }
+    .topbar-badge {
+      background: var(--blue);
+      color: #fff;
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* ── two-column layout ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── left: form ── */
+    .form-col {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .form-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 20px 0;
+    }
+
+    /* ── field ── */
+    .field { margin-bottom: 16px; }
+    .field-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--label);
+      margin-bottom: 5px;
+    }
+    .field-label .opt {
+      font-weight: 400;
+      color: var(--muted);
+    }
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    input[type=text], input[type=date], textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 9px 12px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color .15s, box-shadow .15s;
+      resize: vertical;
+    }
+    input[type=text]:focus, input[type=date]:focus, textarea:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+    }
+    input::placeholder, textarea::placeholder { color: #aab; }
+
+    /* ── buttons ── */
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 14px 20px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s, opacity .15s;
+    }
+    .btn-generate { background: var(--blue);  color: #fff; }
+    .btn-generate:hover:not(:disabled) { background: var(--blue-h); }
+    .btn-pdf      { background: var(--pink);  color: #fff; }
+    .btn-pdf:hover:not(:disabled)      { background: var(--pink-h); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .status-bar {
+      font-size: 0.8rem;
+      padding: 5px 20px 0;
+      min-height: 22px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .s-idle    { color: var(--muted); }
+    .s-loading { color: var(--blue); }
+    .s-done    { color: var(--success); }
+    .s-error   { color: var(--error); }
+
+    .spinner {
+      width: 12px; height: 12px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── right: preview ── */
+    .preview-col {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .preview-topbar {
+      height: 44px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      gap: 10px;
+    }
+    .preview-lbl {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* style pills */
+    .style-row { display: flex; gap: 5px; }
+    .style-btn {
+      padding: 3px 11px;
+      border-radius: 99px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.73rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .style-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .style-btn.active { border-color: var(--blue); background: var(--blue); color: #fff; }
+    .style-btn:disabled { opacity: .38; cursor: not-allowed; }
+
+    iframe {
+      flex: 1;
+      border: none;
+      width: 100%;
+      background: #fff;
+      display: none;
+    }
+    .placeholder {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      gap: 14px;
+    }
+    .placeholder svg { opacity: .18; }
+    .placeholder p { font-size: 0.85rem; text-align: center; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>ESL Mini-Lesson Engine</h1>
+  <span class="topbar-badge">Level 0</span>
+</div>
+
+<div class="layout">
+
+  <!-- ── left: input form ── -->
+  <div class="form-col">
+    <div class="form-scroll">
+
+      <div class="field">
+        <label class="field-label">Article Headline <span class="opt">(Optional)</span></label>
+        <input type="text" id="headline"
+          placeholder="e.g. City to ban cars from downtown" />
+      </div>
+
+      <div class="field field-row">
+        <div>
+          <label class="field-label">Date <span class="opt">(Optional)</span></label>
+          <input type="date" id="lessonDate" />
+        </div>
+        <div>
+          <label class="field-label">Lesson ID <span class="opt">(Optional)</span></label>
+          <input type="text" id="lessonId" placeholder="e.g. demo-001" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">News Source URLs <span class="opt">(Optional)</span></label>
+        <input type="text" id="src1" placeholder="https://..." style="margin-bottom:6px" />
+        <input type="text" id="src2" placeholder="https://..." style="margin-bottom:6px" />
+        <input type="text" id="src3" placeholder="https://..." />
+      </div>
+
+      <div class="field">
+        <label class="field-label">News Article Text</label>
+        <textarea id="article" rows="11"
+          placeholder="Paste the full news article here…"></textarea>
+      </div>
+
+    </div><!-- /form-scroll -->
+
+    <div class="status-bar s-idle" id="status">
+      Ready — fill in the form and click Generate Lesson.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-generate" id="generateBtn">
+        Generate Lesson
+      </button>
+      <button class="btn btn-pdf" id="downloadBtn" disabled>
+        Download PDF
+      </button>
+    </div>
+  </div><!-- /form-col -->
+
+  <!-- ── right: preview ── -->
+  <div class="preview-col">
+    <div class="preview-topbar">
+      <span class="preview-lbl">Preview</span>
+      <div class="style-row" id="styleRow"></div>
+    </div>
+
+    <div class="placeholder" id="placeholder">
+      <svg width="60" height="60" fill="none" viewBox="0 0 24 24"
+           stroke="currentColor" stroke-width="1">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      <p>Your printable lesson will appear here.<br>
+         Paste an article and click <strong>Generate Lesson</strong>.</p>
+    </div>
+
+    <iframe id="preview" title="Lesson preview"></iframe>
+  </div>
+
+</div><!-- /layout -->
+
+<script>
+  const headlineEl  = document.getElementById('headline');
+  const articleEl   = document.getElementById('article');
+  const src1El      = document.getElementById('src1');
+  const src2El      = document.getElementById('src2');
+  const src3El      = document.getElementById('src3');
+  const dateEl      = document.getElementById('lessonDate');
+  const lessonIdEl  = document.getElementById('lessonId');
+  const generateBtn = document.getElementById('generateBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const statusEl    = document.getElementById('status');
+  const previewEl   = document.getElementById('preview');
+  const placeholderEl = document.getElementById('placeholder');
+  const styleRow    = document.getElementById('styleRow');
+
+  let lastHtml     = null;
+  let lastData     = null;
+  let lastHeadline = '';
+  let lastSources  = [];
+  let lastMeta     = {};
+  let activeStyle  = 'classic';
+
+  function setStatus(msg, type, spinner = false) {
+    statusEl.className = `status-bar s-${type}`;
+    statusEl.innerHTML = spinner ? `<span class="spinner"></span>${msg}` : msg;
+  }
+
+  // ── load theme buttons ─────────────────────────────────────────────────────
+  fetch('/api/themes').then(r => r.json()).then(themes => {
+    themes.forEach(({ id, label }) => {
+      const btn = document.createElement('button');
+      btn.className = 'style-btn' + (id === 'classic' ? ' active' : '');
+      btn.textContent = label;
+      btn.dataset.style = id;
+      btn.disabled = true;
+      btn.addEventListener('click', () => switchStyle(id));
+      styleRow.appendChild(btn);
+    });
+  }).catch(() => {});
+
+  function setActiveStyleBtn(id) {
+    styleRow.querySelectorAll('.style-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.style === id));
+  }
+  function enableStyleBtns(on) {
+    styleRow.querySelectorAll('.style-btn').forEach(b => { b.disabled = !on; });
+  }
+
+  // ── switch style (no AI call) ──────────────────────────────────────────────
+  async function switchStyle(style) {
+    if (!lastData || style === activeStyle) return;
+    enableStyleBtns(false);
+    setStatus('Switching style…', 'loading', true);
+    try {
+      const res  = await fetch('/api/render', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          headline: lastHeadline,
+          sources:  lastSources,
+          meta:     lastMeta,
+          data:     lastData,
+          style,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) throw new Error(json.error);
+      lastHtml    = json.html;
+      activeStyle = style;
+      previewEl.srcdoc = lastHtml;
+      setActiveStyleBtn(style);
+      setStatus('Style applied.', 'done');
+    } catch (err) {
+      setStatus(`Style error: ${err.message}`, 'error');
+    } finally {
+      enableStyleBtns(true);
+    }
+  }
+
+  // ── generate ───────────────────────────────────────────────────────────────
+  generateBtn.addEventListener('click', async () => {
+    const headline = headlineEl.value.trim();
+    const article  = articleEl.value.trim();
+    if (!article) { setStatus('Please paste the article text.', 'error'); return; }
+
+    const sources = [src1El.value, src2El.value, src3El.value]
+      .map(s => s.trim()).filter(Boolean);
+    const meta = {
+      date:     dateEl.value      || null,
+      lessonId: lessonIdEl.value.trim() || null,
+    };
+
+    generateBtn.disabled = true;
+    downloadBtn.disabled = true;
+    enableStyleBtns(false);
+    setStatus('Generating lesson… 20–40 s', 'loading', true);
+    lastData = null; lastHtml = null;
+
+    try {
+      const res  = await fetch('/api/generate-level0', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ headline, article, sources, meta, style: activeStyle }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
+
+      const { html, ...lessonData } = data;
+      lastData     = lessonData;
+      lastHtml     = html;
+      lastHeadline = headline;
+      lastSources  = sources;
+      lastMeta     = meta;
+
+      placeholderEl.style.display = 'none';
+      previewEl.style.display     = 'block';
+      previewEl.srcdoc            = lastHtml;
+      downloadBtn.disabled = false;
+      enableStyleBtns(true);
+      setStatus('Lesson generated!', 'done');
+    } catch (err) {
+      setStatus(`Error: ${err.message}`, 'error');
+    } finally {
+      generateBtn.disabled = false;
+    }
+  });
+
+  // ── download PDF ───────────────────────────────────────────────────────────
+  downloadBtn.addEventListener('click', async () => {
+    if (!lastHtml) return;
+    downloadBtn.disabled = true;
+    setStatus('Generating PDF…', 'loading', true);
+    try {
+      const res = await fetch('/api/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html: lastHtml }),
+      });
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        throw new Error(e.error || `HTTP ${res.status}`);
+      }
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const id   = lastMeta.lessonId || activeStyle;
+      const a    = Object.assign(document.createElement('a'), {
+        href: url, download: `lesson-${id}.pdf`,
+      });
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setStatus('PDF downloaded!', 'done');
+    } catch (err) {
+      setStatus(`PDF error: ${err.message}`, 'error');
+    } finally {
+      downloadBtn.disabled = false;
+    }
+  });
+
+  // Ctrl/Cmd+Enter
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !generateBtn.disabled)
+      generateBtn.click();
+  });
+</script>
+
+</body>
+</html>
